@@ -120,7 +120,7 @@ The webapp provides:
 - **Performance optimized** with lazy loading and efficient rendering
 - **Automatic deployment** to GitHub Pages
 
-🌐 **Live Demo**: [View the webapp](https://ghost0159.github.io/NXProjects-tracker)
+🌐 **Live Demo**: [View the webapp](https://nxhub.pw)
 
 ## Automation
 

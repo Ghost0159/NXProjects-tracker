@@ -157,6 +157,10 @@ The interface automatically adapts to all screens:
 - **Debouncing** : Optimized search
 - **Intersection Observer** : On-demand loading
 
+## 🌐 Live Demo
+
+Visit the live web interface: [NX Projects Tracker](https://nxhub.pw)
+
 ## 🛠️ Development
 
 ### Adding new features
