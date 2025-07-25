@@ -494,12 +494,14 @@
         border-top: 1px solid var(--border-light);
         background: var(--bg-primary);
         margin-top: var(--spacing-2xl);
+        text-align: center;
     }
     
     .footer-content {
         flex-direction: column;
         gap: var(--spacing-md);
         text-align: center;
+        align-items: center;
     }
     
     .footer-content p {
@@ -507,12 +509,15 @@
         color: var(--text-secondary);
         margin: 0;
         line-height: 1.4;
+        text-align: center;
     }
     
     .footer-links {
         flex-direction: column;
         gap: var(--spacing-sm);
         align-items: center;
+        justify-content: center;
+        text-align: center;
     }
     
     .footer-links a {
@@ -522,6 +527,7 @@
         padding: var(--spacing-xs) var(--spacing-sm);
         border-radius: var(--radius-sm);
         transition: all var(--transition-fast);
+        text-align: center;
     }
     
     .footer-links a:hover {
@@ -531,6 +537,17 @@
     
     .footer-links .separator {
         display: none;
+    }
+    
+    .footer-links .version {
+        font-size: var(--font-size-sm);
+        color: var(--text-secondary);
+        padding: var(--spacing-xs) var(--spacing-sm);
+        border-radius: var(--radius-sm);
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-light);
+        font-weight: 500;
+        text-align: center;
     }
     
     /* Hero improvements */

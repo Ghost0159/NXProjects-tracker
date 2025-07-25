@@ -330,6 +330,13 @@ body {
     color: var(--text-muted);
 }
 
+.footer-links .version {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    font-weight: 500;
+    opacity: 0.8;
+}
+
 /* Utility Classes */
 .sr-only {
     position: absolute;
