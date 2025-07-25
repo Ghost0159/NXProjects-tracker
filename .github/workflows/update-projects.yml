@@ -44,6 +44,11 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    - name: Copy projects.json to webapp
+      run: |
+        mkdir -p webapp/data
+        cp output/projects.json webapp/data/projects.json
+
     - name: Deploy webapp to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
