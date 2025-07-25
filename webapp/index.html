@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NX Projects Tracker - Nintendo Switch Homebrew</title>
+    <meta name="description" content="Discover and track the latest Nintendo Switch homebrew projects with detailed information, firmware requirements, and real-time updates.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.css">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/responsive.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-logo">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+            </div>
+            <h2>Loading Projects</h2>
+            <div class="loading-spinner"></div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    </svg>
+                    <h1>NX Projects Tracker</h1>
+                </div>
+                <nav class="nav">
+                    <a href="https://github.com/Ghost0159/NXProjects-tracker" target="_blank" rel="noopener" class="nav-link">
+                        <i data-lucide="github"></i>
+                        GitHub
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Hero Section -->
+            <section class="hero">
+                <div class="hero-content">
+                    <h2>Nintendo Switch Homebrew Projects</h2>
+                    <p>Discover and track the latest homebrew projects for your Nintendo Switch with detailed information, firmware requirements, and real-time updates.</p>
+                </div>
+            </section>
+
+            <!-- Stats Section -->
+            <section class="stats-section">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i data-lucide="package"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="total-projects">0</h3>
+                            <p>Total Projects</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i data-lucide="star"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="total-stars">0</h3>
+                            <p>Total Stars</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i data-lucide="git-fork"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="total-forks">0</h3>
+                            <p>Total Forks</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i data-lucide="code"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="total-languages">0</h3>
+                            <p>Languages</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Controls Section -->
+            <section class="controls-section">
+                <div class="controls-grid">
+                    <!-- Search -->
+                    <div class="search-container">
+                        <div class="search-input-wrapper">
+                            <i data-lucide="search" class="search-icon"></i>
+                            <input type="text" id="search-input" placeholder="Search projects, authors, or descriptions..." class="search-input">
+                            <button id="clear-search" class="clear-search" style="display: none;">
+                                <i data-lucide="x"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="filters-container">
+                        <div class="filter-group">
+                            <label for="language-filter" class="filter-label">Language</label>
+                            <select id="language-filter" class="filter-select">
+                                <option value="all">All Languages</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="sort-select" class="filter-label">Sort By</label>
+                            <select id="sort-select" class="filter-select">
+                                <option value="stars">Most Stars</option>
+                                <option value="forks">Most Forks</option>
+                                <option value="name">Name A-Z</option>
+                                <option value="author">Author A-Z</option>
+                                <option value="latest">Latest Update</option>
+                                <option value="created">Recently Created</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Projects Grid -->
+            <section class="projects-section">
+                <div id="projects-grid" class="projects-grid">
+                    <!-- Projects will be dynamically inserted here -->
+                </div>
+                
+                <!-- No Results -->
+                <div id="no-results" class="no-results" style="display: none;">
+                    <div class="no-results-content">
+                        <i data-lucide="search-x"></i>
+                        <h3>No projects found</h3>
+                        <p>Try adjusting your search or filters</p>
+                    </div>
+                </div>
+
+                <!-- Error State -->
+                <div id="error-state" class="error-state" style="display: none;">
+                    <div class="error-content">
+                        <i data-lucide="alert-circle"></i>
+                        <h3>Failed to load projects</h3>
+                        <p id="error-message">An error occurred while loading the projects.</p>
+                        <button id="retry-button" class="btn btn-primary">
+                            <i data-lucide="refresh-cw"></i>
+                            Try Again
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2025 Ghost0159. Built with ❤️ for the Nintendo Switch community.</p>
+                <div class="footer-links">
+                    <a href="https://github.com/Ghost0159/NXProjects-tracker" target="_blank" rel="noopener">GitHub</a>
+                    <span class="separator">•</span>
+                    <a href="#" id="last-updated">Last updated: Loading...</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Project Modal -->
+    <div id="project-modal" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Project Details</h3>
+                <button class="modal-close" id="modal-close">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Modal content will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/utils.js"></script>
+</body>
+</html> 

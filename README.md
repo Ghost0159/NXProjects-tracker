@@ -8,6 +8,8 @@ Automated tracker for Nintendo Switch homebrew projects that generates a JSON fi
 - 📊 **GitHub Integration**: Fetches project data from GitHub repositories
 - ⚙️ **Configurable**: Easy project and firmware management
 - 📁 **Structured Output**: Generates standardized JSON format
+- 🌐 **Modern Web Interface**: Beautiful, responsive React webapp
+- 📱 **Mobile Friendly**: Works perfectly on all devices
 
 ## Quick Start
 
@@ -93,6 +95,32 @@ default_firmware: "20.2.0"
 |---------|-------------|
 | `npm start` | Run the tracker and generate JSON |
 | `npm run add "owner/repo" "firmware"` | Add new project to configuration |
+
+## Web Interface
+
+A modern, professional web interface is included in the `webapp/` directory, built with vanilla HTML/CSS/JavaScript for optimal performance:
+
+```bash
+cd webapp
+# Open directly in browser
+open index.html
+
+# Or use a local server
+python3 -m http.server 8000
+```
+
+The webapp provides:
+- **Modern UI/UX** with professional design and smooth animations
+- **Dark mode support** with automatic theme detection
+- **Real-time search** through projects with instant results
+- **Advanced filtering** by language and multiple sorting options
+- **Rich project cards** with detailed information and hover effects
+- **Responsive design** optimized for all devices (desktop, tablet, mobile)
+- **Keyboard navigation** with full accessibility support
+- **Performance optimized** with lazy loading and efficient rendering
+- **Automatic deployment** to GitHub Pages
+
+🌐 **Live Demo**: [View the webapp](https://ghost0159.github.io/NXProjects-tracker)
 
 ## Automation
 
