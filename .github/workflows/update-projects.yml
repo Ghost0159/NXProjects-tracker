@@ -50,15 +50,9 @@ jobs:
         mkdir -p webapp/output
         cp output/projects.json webapp/data/projects.json
         cp output/projects.json webapp/output/projects.json
-        echo "JSON files copied successfully"
-        ls -la webapp/data/
-        ls -la webapp/output/
 
     - name: Deploy webapp to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./webapp
-        force_orphan: true
-        user_name: 'github-actions[bot]'
-        user_email: 'github-actions[bot]@users.noreply.github.com' 
+        publish_dir: ./webapp 
