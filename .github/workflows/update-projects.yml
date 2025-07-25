@@ -1,4 +1,4 @@
-name: Update Projects JSON
+name: Update Projects JSON and Deploy Webapp
 
 on:
   schedule:
@@ -28,30 +28,24 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
-               - name: Commit and push changes
-             run: |
-               git config --local user.email "action@github.com"
-               git config --local user.name "GitHub Action"
-               git add output/projects.json
-               git diff --quiet && git diff --staged --quiet || git commit -m "Update projects.json - $(date)"
-               git push
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add output/projects.json
+        git diff --quiet && git diff --staged --quiet || git commit -m "Update projects.json - $(date)"
+        git push
 
-           - name: Setup Node.js for webapp
-             uses: actions/setup-node@v4
-             with:
-               node-version: '18'
-               cache: 'npm'
+  deploy-webapp:
+    needs: update-projects
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-           - name: Install webapp dependencies
-             working-directory: ./webapp
-             run: npm ci
-
-           - name: Build webapp
-             working-directory: ./webapp
-             run: npm run build
-
-           - name: Deploy webapp to GitHub Pages
-             uses: peaceiris/actions-gh-pages@v3
-             with:
-               github_token: ${{ secrets.GITHUB_TOKEN }}
-               publish_dir: ./webapp/build 
+    - name: Deploy webapp to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./webapp 

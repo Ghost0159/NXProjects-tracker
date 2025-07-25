@@ -13,22 +13,8 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-
-    - name: Install webapp dependencies
-      working-directory: ./webapp
-      run: npm ci
-
-    - name: Build webapp
-      working-directory: ./webapp
-      run: npm run build
-
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./webapp/build
+        publish_dir: ./webapp
