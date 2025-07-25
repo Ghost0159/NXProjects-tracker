@@ -1,0 +1,13 @@
+# Dependencies
+node_modules/
+
+# dotenv environment variables file
+.env
+
+# Logs
+logs
+*.log
+
+# Temporary files
+tmp/
+temp/ 
