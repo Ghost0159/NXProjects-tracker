@@ -48,31 +48,31 @@ class NXProjectsTracker {
     async loadProjects() {
         try {
             // Try to load from the real data source first
-            const response = await fetch('/output/projects.json');
+            const response = await fetch('./output/projects.json');
             if (response.ok) {
                 const data = await response.json();
                 this.projects = data.projects || [];
                 return;
             }
         } catch (error) {
-            console.warn('Could not load from /output/projects.json, trying local data');
+            console.warn('Could not load from ./output/projects.json, trying local data');
         }
 
         try {
             // Try to load from local data file
-            const response = await fetch('/data/projects.json');
+            const response = await fetch('./data/projects.json');
             if (response.ok) {
                 const data = await response.json();
                 this.projects = data.projects || [];
                 return;
             }
         } catch (error) {
-            console.warn('Could not load from /data/projects.json');
+            console.warn('Could not load from ./data/projects.json');
         }
 
         // No fallback data - show empty state
         this.projects = [];
-        console.warn('No project data available. Please ensure /output/projects.json or /data/projects.json exists.');
+        console.warn('No project data available. Please ensure ./output/projects.json or ./data/projects.json exists.');
     }
 
     setupEventListeners() {

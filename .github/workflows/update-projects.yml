@@ -47,7 +47,9 @@ jobs:
     - name: Copy projects.json to webapp
       run: |
         mkdir -p webapp/data
+        mkdir -p webapp/output
         cp output/projects.json webapp/data/projects.json
+        cp output/projects.json webapp/output/projects.json
 
     - name: Deploy webapp to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
