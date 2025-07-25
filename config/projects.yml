@@ -61,3 +61,4 @@ projects:
   - repo: "cy33hc/switch-ezremote-client"
   - repo: "proconsule/nxmp"
   - repo: "THZoria/deltarune_fr_switch" 
+  - repo: "spacemeowx2/ldn_mitm" 
