@@ -6,6 +6,11 @@ on:
     - cron: '0 */6 * * *'
   workflow_dispatch: # Allow manual trigger
 
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   update-projects:
     runs-on: ubuntu-latest
@@ -55,4 +60,5 @@ jobs:
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./webapp 
+        publish_dir: ./webapp
+        force_orphan: true 
