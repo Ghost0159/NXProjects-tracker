@@ -12,6 +12,13 @@ class NXProjectsTracker {
             language: 'all',
             sortBy: 'stars'
         };
+        this.currentPage = 1;
+        this.itemsPerPage = 12;
+        this.totalPages = 1;
+        this.lastScrollTop = 0;
+        this.scrollThreshold = 100;
+        this.isScrolling = false;
+        this.scrollTimeout = null;
         
         this.init();
     }
@@ -32,6 +39,13 @@ class NXProjectsTracker {
             this.updateLanguageFilter();
             this.filterProjects(); // Initialize filtered projects
             this.renderProjects();
+            this.renderPagination(); // Initialize pagination
+            
+            console.log('App initialized with:', {
+                totalProjects: this.projects.length,
+                filteredProjects: this.filteredProjects.length,
+                totalPages: this.totalPages
+            });
             
             // Reinitialize icons after rendering
             lucide.createIcons();
@@ -127,6 +141,12 @@ class NXProjectsTracker {
             }
         });
 
+        // Setup header scroll behavior
+        this.setupHeaderScrollBehavior();
+        
+        // Setup scroll to top functionality
+        this.setupScrollToTop();
+
         // Update last updated time
         this.updateLastUpdated();
     }
@@ -142,7 +162,9 @@ class NXProjectsTracker {
 
     filterAndRender() {
         this.filterProjects();
+        this.currentPage = 1; // Reset to first page when filtering
         this.renderProjects();
+        this.renderPagination();
     }
 
     filterProjects() {
@@ -187,56 +209,47 @@ class NXProjectsTracker {
     }
 
     renderProjects() {
-        const projectsGrid = document.getElementById('projects-grid');
+        const grid = document.getElementById('projects-grid');
         const noResults = document.getElementById('no-results');
-
+        const errorState = document.getElementById('error-state');
+        
         if (this.projects.length === 0) {
-            // No data available at all
-            projectsGrid.innerHTML = '';
-            noResults.style.display = 'block';
-            noResults.innerHTML = `
-                <div class="no-results-content">
-                    <i data-lucide="database-off"></i>
-                    <h3>No project data available</h3>
-                    <p>Please ensure the tracker has generated data or check your configuration.</p>
-                    <button class="btn btn-primary" onclick="location.reload()">
-                        <i data-lucide="refresh-cw"></i>
-                        Refresh Page
-                    </button>
-                </div>
-            `;
-            lucide.createIcons();
+            grid.innerHTML = '';
+            noResults.style.display = 'none';
+            errorState.style.display = 'block';
             return;
         }
-
+        
         if (this.filteredProjects.length === 0) {
-            // No results from search/filter
-            projectsGrid.innerHTML = '';
+            grid.innerHTML = '';
             noResults.style.display = 'block';
-            noResults.innerHTML = `
-                <div class="no-results-content">
-                    <i data-lucide="search-x"></i>
-                    <h3>No projects found</h3>
-                    <p>Try adjusting your search or filters</p>
-                </div>
-            `;
-            lucide.createIcons();
+            errorState.style.display = 'none';
             return;
         }
-
+        
         noResults.style.display = 'none';
-        projectsGrid.innerHTML = this.filteredProjects.map(project => this.createProjectCard(project)).join('');
-
+        errorState.style.display = 'none';
+        
+        // Calculate pagination
+        const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+        const endIndex = startIndex + this.itemsPerPage;
+        const projectsToShow = this.filteredProjects.slice(startIndex, endIndex);
+        
+        grid.innerHTML = projectsToShow.map(project => this.createProjectCard(project)).join('');
+        
         // Add click listeners to project cards
-        const projectCards = projectsGrid.querySelectorAll('.project-card');
+        const projectCards = grid.querySelectorAll('.project-card');
         projectCards.forEach((card, index) => {
             card.addEventListener('click', () => {
-                this.openProjectModal(this.filteredProjects[index]);
+                this.openProjectModal(projectsToShow[index]);
             });
         });
-
+        
         // Reinitialize icons in project cards
         lucide.createIcons();
+        
+        // Update stats
+        this.updateStats();
     }
 
     createProjectCard(project) {
@@ -408,6 +421,14 @@ class NXProjectsTracker {
 
     closeModal() {
         const modal = document.getElementById('project-modal');
+        const modalContent = modal.querySelector('.modal-content');
+        
+        // Reset any inline styles that might have been set by swipe
+        if (modalContent) {
+            modalContent.style.transform = '';
+            modalContent.style.opacity = '';
+            modalContent.style.transition = '';
+        }
         
         // Add hiding class for animation
         modal.classList.add('hiding');
@@ -416,6 +437,13 @@ class NXProjectsTracker {
         setTimeout(() => {
             modal.classList.remove('show', 'hiding');
             document.body.style.overflow = '';
+            
+            // Ensure all styles are reset
+            if (modalContent) {
+                modalContent.style.transform = '';
+                modalContent.style.opacity = '';
+                modalContent.style.transition = '';
+            }
         }, 300);
     }
 
@@ -489,15 +517,247 @@ class NXProjectsTracker {
 
     updateLastUpdated() {
         const lastUpdatedElement = document.getElementById('last-updated');
-        const now = new Date();
-        const formattedDate = now.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
+        if (lastUpdatedElement) {
+            const now = new Date();
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit',
+                timeZoneName: 'short'
+            };
+            const formattedDate = now.toLocaleDateString('en-US', options);
+            lastUpdatedElement.textContent = `Last updated: ${formattedDate}`;
+        }
+    }
+
+    // ============================================================================
+    // PAGINATION METHODS
+    // ============================================================================
+
+    renderPagination() {
+        const pagination = document.getElementById('pagination');
+        const paginationInfo = document.getElementById('pagination-info');
+        const paginationPages = document.getElementById('pagination-pages');
+        const prevBtn = document.getElementById('pagination-prev');
+        const nextBtn = document.getElementById('pagination-next');
+        
+        if (this.filteredProjects.length === 0) {
+            pagination.style.display = 'none';
+            return;
+        }
+        
+        this.totalPages = Math.ceil(this.filteredProjects.length / this.itemsPerPage);
+        
+        // Always show pagination if there are projects, even if only one page
+        pagination.style.display = 'flex';
+        
+        // Update pagination info
+        const startItem = (this.currentPage - 1) * this.itemsPerPage + 1;
+        const endItem = Math.min(this.currentPage * this.itemsPerPage, this.filteredProjects.length);
+        paginationInfo.textContent = `Showing ${startItem}-${endItem} of ${this.filteredProjects.length} projects`;
+        
+        // Update prev/next buttons
+        prevBtn.disabled = this.currentPage === 1;
+        nextBtn.disabled = this.currentPage === this.totalPages;
+        
+        // Generate page numbers
+        paginationPages.innerHTML = this.generatePageNumbers();
+        
+        // Add event listeners
+        this.setupPaginationEventListeners();
+    }
+
+    generatePageNumbers() {
+        const pages = [];
+        const maxVisiblePages = 5;
+        
+        if (this.totalPages <= 1) {
+            // Show single page
+            pages.push(this.createPageNumber(1));
+        } else if (this.totalPages <= maxVisiblePages) {
+            // Show all pages if total is small
+            for (let i = 1; i <= this.totalPages; i++) {
+                pages.push(this.createPageNumber(i));
+            }
+        } else {
+            // Show smart pagination with ellipsis
+            if (this.currentPage <= 3) {
+                // Show first 3 pages + ellipsis + last page
+                for (let i = 1; i <= 3; i++) {
+                    pages.push(this.createPageNumber(i));
+                }
+                pages.push('<span class="pagination-ellipsis">...</span>');
+                pages.push(this.createPageNumber(this.totalPages));
+            } else if (this.currentPage >= this.totalPages - 2) {
+                // Show first page + ellipsis + last 3 pages
+                pages.push(this.createPageNumber(1));
+                pages.push('<span class="pagination-ellipsis">...</span>');
+                for (let i = this.totalPages - 2; i <= this.totalPages; i++) {
+                    pages.push(this.createPageNumber(i));
+                }
+            } else {
+                // Show first page + ellipsis + current page + ellipsis + last page
+                pages.push(this.createPageNumber(1));
+                pages.push('<span class="pagination-ellipsis">...</span>');
+                for (let i = this.currentPage - 1; i <= this.currentPage + 1; i++) {
+                    pages.push(this.createPageNumber(i));
+                }
+                pages.push('<span class="pagination-ellipsis">...</span>');
+                pages.push(this.createPageNumber(this.totalPages));
+            }
+        }
+        
+        return pages.join('');
+    }
+
+    createPageNumber(pageNum) {
+        const isActive = pageNum === this.currentPage;
+        return `<button class="pagination-page ${isActive ? 'active' : ''}" data-page="${pageNum}">${pageNum}</button>`;
+    }
+
+    setupPaginationEventListeners() {
+        const prevBtn = document.getElementById('pagination-prev');
+        const nextBtn = document.getElementById('pagination-next');
+        const paginationPages = document.getElementById('pagination-pages');
+        
+        // Remove existing listeners
+        prevBtn.replaceWith(prevBtn.cloneNode(true));
+        nextBtn.replaceWith(nextBtn.cloneNode(true));
+        
+        // Add new listeners
+        document.getElementById('pagination-prev').addEventListener('click', () => {
+            if (this.currentPage > 1) {
+                this.goToPage(this.currentPage - 1);
+            }
         });
-        lastUpdatedElement.textContent = `Last updated: ${formattedDate}`;
+        
+        document.getElementById('pagination-next').addEventListener('click', () => {
+            if (this.currentPage < this.totalPages) {
+                this.goToPage(this.currentPage + 1);
+            }
+        });
+        
+        // Add page number listeners
+        paginationPages.addEventListener('click', (e) => {
+            if (e.target.classList.contains('pagination-page')) {
+                const page = parseInt(e.target.dataset.page);
+                this.goToPage(page);
+            }
+        });
+    }
+
+    goToPage(page) {
+        this.currentPage = page;
+        this.renderProjects();
+        this.renderPagination();
+        this.scrollToTop();
+    }
+
+    // ============================================================================
+    // HEADER SCROLL BEHAVIOR
+    // ============================================================================
+
+    setupHeaderScrollBehavior() {
+        const header = document.querySelector('.header');
+        let lastScrollTop = 0;
+        let ticking = false;
+        let hideTimeout = null;
+        
+        // Adjust threshold for mobile
+        const isMobile = window.innerWidth <= 575;
+        const scrollThreshold = isMobile ? 30 : this.scrollThreshold;
+        
+        const updateHeader = () => {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            // Add scrolled class for shadow
+            if (scrollTop > scrollThreshold) {
+                header.classList.add('header-scrolled');
+            } else {
+                header.classList.remove('header-scrolled');
+            }
+            
+            // Only hide/show header on desktop, keep it always visible on mobile
+            if (!isMobile) {
+                const hideThreshold = 800;
+                
+                // Clear any existing timeout
+                if (hideTimeout) {
+                    clearTimeout(hideTimeout);
+                }
+                
+                // Hide/show header based on scroll direction
+                if (scrollTop > lastScrollTop && scrollTop > hideThreshold) {
+                    // Scrolling down - add delay before hiding
+                    hideTimeout = setTimeout(() => {
+                        header.classList.add('header-hidden');
+                    }, 150);
+                } else {
+                    // Scrolling up - show immediately
+                    header.classList.remove('header-hidden');
+                }
+            } else {
+                // On mobile, always show the header
+                header.classList.remove('header-hidden');
+            }
+            
+            lastScrollTop = scrollTop;
+            ticking = false;
+        };
+        
+        const requestTick = () => {
+            if (!ticking) {
+                requestAnimationFrame(updateHeader);
+                ticking = true;
+            }
+        };
+        
+        window.addEventListener('scroll', requestTick, { passive: true });
+        
+        // Reset header state on resize
+        window.addEventListener('resize', () => {
+            if (!isMobile) {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                if (scrollTop <= 800) {
+                    header.classList.remove('header-hidden');
+                }
+            } else {
+                header.classList.remove('header-hidden');
+            }
+        });
+    }
+
+    // ============================================================================
+    // SCROLL TO TOP FUNCTIONALITY
+    // ============================================================================
+
+    setupScrollToTop() {
+        const scrollToTopBtn = document.getElementById('scroll-to-top');
+        
+        const toggleScrollToTop = () => {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            if (scrollTop > 300) {
+                scrollToTopBtn.classList.add('show');
+            } else {
+                scrollToTopBtn.classList.remove('show');
+            }
+        };
+        
+        scrollToTopBtn.addEventListener('click', () => {
+            this.scrollToTop();
+        });
+        
+        window.addEventListener('scroll', toggleScrollToTop, { passive: true });
+    }
+
+    scrollToTop() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
     }
 
     // Utility functions
@@ -611,9 +871,16 @@ class NXProjectsTracker {
             if (deltaY > 100 || velocity > 0.5) {
                 this.closeModal();
             } else {
-                // Reset position
+                // Reset position and ensure proper cleanup
                 modalContent.style.transform = 'translateY(0)';
                 modalContent.style.opacity = '1';
+                
+                // Clear transition after animation
+                setTimeout(() => {
+                    if (modalContent && !modal.classList.contains('show')) {
+                        modalContent.style.transition = '';
+                    }
+                }, 300);
             }
         };
 
