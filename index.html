@@ -63,7 +63,7 @@
             <section class="hero">
                 <div class="hero-content">
                     <h2>Nintendo Switch Homebrew Projects</h2>
-                    <p>Discover and track the latest homebrew projects for your Nintendo Switch with detailed information, firmware requirements, and real-time updates.</p>
+                    <p>Discover and track the latest homebrew projects for your Nintendo Switch with detailed information, firmware requirements, and real-time updates. Stay up-to-date with the vibrant homebrew community.</p>
                 </div>
             </section>
 
@@ -152,6 +152,26 @@
                     <!-- Projects will be dynamically inserted here -->
                 </div>
                 
+                <!-- Pagination -->
+                <div id="pagination" class="pagination" style="display: none;">
+                    <div class="pagination-info">
+                        <span id="pagination-info">Showing 1-12 of 0 projects</span>
+                    </div>
+                    <div class="pagination-controls">
+                        <button id="pagination-prev" class="btn btn-secondary pagination-btn" disabled>
+                            <i data-lucide="chevron-left"></i>
+                            Previous
+                        </button>
+                        <div class="pagination-pages" id="pagination-pages">
+                            <!-- Page numbers will be dynamically inserted here -->
+                        </div>
+                        <button id="pagination-next" class="btn btn-secondary pagination-btn" disabled>
+                            Next
+                            <i data-lucide="chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+                
                 <!-- No Results -->
                 <div id="no-results" class="no-results" style="display: none;">
                     <div class="no-results-content">
@@ -176,6 +196,11 @@
             </section>
         </div>
     </main>
+
+    <!-- Scroll to Top Button -->
+    <button id="scroll-to-top" class="scroll-to-top" style="display: none;">
+        <i data-lucide="arrow-up"></i>
+    </button>
 
     <!-- Footer -->
     <footer class="footer">
