@@ -15,10 +15,6 @@ class NXProjectsTracker {
         this.currentPage = 1;
         this.itemsPerPage = 12;
         this.totalPages = 1;
-        this.lastScrollTop = 0;
-        this.scrollThreshold = 100;
-        this.isScrolling = false;
-        this.scrollTimeout = null;
         
         this.init();
     }
@@ -141,9 +137,6 @@ class NXProjectsTracker {
             }
         });
 
-        // Setup header scroll behavior
-        this.setupHeaderScrollBehavior();
-        
         // Setup scroll to top functionality
         this.setupScrollToTop();
 
@@ -653,80 +646,6 @@ class NXProjectsTracker {
         this.renderProjects();
         this.renderPagination();
         this.scrollToTop();
-    }
-
-    // ============================================================================
-    // HEADER SCROLL BEHAVIOR
-    // ============================================================================
-
-    setupHeaderScrollBehavior() {
-        const header = document.querySelector('.header');
-        let lastScrollTop = 0;
-        let ticking = false;
-        let hideTimeout = null;
-        
-        // Adjust threshold for mobile
-        const isMobile = window.innerWidth <= 575;
-        const scrollThreshold = isMobile ? 30 : this.scrollThreshold;
-        
-        const updateHeader = () => {
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            
-            // Add scrolled class for shadow
-            if (scrollTop > scrollThreshold) {
-                header.classList.add('header-scrolled');
-            } else {
-                header.classList.remove('header-scrolled');
-            }
-            
-            // Only hide/show header on desktop, keep it always visible on mobile
-            if (!isMobile) {
-                const hideThreshold = 800;
-                
-                // Clear any existing timeout
-                if (hideTimeout) {
-                    clearTimeout(hideTimeout);
-                }
-                
-                // Hide/show header based on scroll direction
-                if (scrollTop > lastScrollTop && scrollTop > hideThreshold) {
-                    // Scrolling down - add delay before hiding
-                    hideTimeout = setTimeout(() => {
-                        header.classList.add('header-hidden');
-                    }, 150);
-                } else {
-                    // Scrolling up - show immediately
-                    header.classList.remove('header-hidden');
-                }
-            } else {
-                // On mobile, always show the header
-                header.classList.remove('header-hidden');
-            }
-            
-            lastScrollTop = scrollTop;
-            ticking = false;
-        };
-        
-        const requestTick = () => {
-            if (!ticking) {
-                requestAnimationFrame(updateHeader);
-                ticking = true;
-            }
-        };
-        
-        window.addEventListener('scroll', requestTick, { passive: true });
-        
-        // Reset header state on resize
-        window.addEventListener('resize', () => {
-            if (!isMobile) {
-                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                if (scrollTop <= 800) {
-                    header.classList.remove('header-hidden');
-                }
-            } else {
-                header.classList.remove('header-hidden');
-            }
-        });
     }
 
     // ============================================================================
